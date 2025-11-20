@@ -1,1 +1,21 @@
-environment.yml
+# Ignore dataset and model folders
+data/
+models/
+
+# Ignore large ML files
+*.npy
+*.npz
+*.h5
+*.hdf5
+*.pth
+*.pt
+*.pkl
+
+# Ignore Python cache
+__pycache__/
+
+# Ignore Jupyter temporary folders
+.ipynb_checkpoints/
+
+# Ignore logs
+*.log
