@@ -1,11 +1,10 @@
-from src.integration_clients import (
-    BaseEmbeddingClient,
-    NoOpEmbeddingClient,
-    BaseAnomalyClient,
-    NoOpAnomalyClient,
-    FewShotResult,
-    BaseFewShotClient,
-    NoOpFewShotClient,
-)
+import numpy as np
+from src.detector import YoloDetector
+from src.config import DetectionConfig
 
-print("import ok")
+cfg = DetectionConfig()
+detector = YoloDetector(cfg)
+
+frame = np.zeros((480, 640, 3), dtype=np.uint8)
+out = detector.detect(frame, frame_id=1)
+print(out)

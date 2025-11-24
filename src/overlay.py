@@ -3,13 +3,14 @@
 import cv2
 
 from src.types import FrameTracks, CountingState
+from typing import Optional
 
 
 def draw_tracks_and_counts(
     frame,
     frame_tracks: FrameTracks,
     counts: CountingState,
-    line_y: float | None = None,
+    line_y: Optional[float] = None,
 ):
     """
     Draw bounding boxes, track IDs, class labels, and total counts on the frame.

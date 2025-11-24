@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 
 from src.config import PipelineConfig
-from src.detector import DummyDetector  # later: replace with YoloDetector
+from src.detector import YoloDetector
 from src.tracker import DummyTracker    # later: replace with real tracker
 from src.counter import LineCounter, CountingState
 from src.overlay import draw_tracks_and_counts
@@ -38,7 +38,7 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
         raise RuntimeError(f"Could not open video source: {video_source}")
 
     # Person A components
-    detector = DummyDetector()
+    detector = YoloDetector(config.detection)
     tracker = DummyTracker()
     counter = LineCounter(config.counting.line_position)
 
