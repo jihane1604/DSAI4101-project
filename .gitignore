@@ -19,3 +19,7 @@ __pycache__/
 
 # Ignore logs
 *.log
+
+# Ignore environment files
+.env
+environment.yml
