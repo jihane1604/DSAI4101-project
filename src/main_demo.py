@@ -6,7 +6,7 @@ import numpy as np
 
 from src.config import PipelineConfig
 from src.detector import YoloDetector
-from src.tracker import DummyTracker    # later: replace with real tracker
+from src.tracker import SimpleIOUTracker
 from src.counter import LineCounter, CountingState
 from src.overlay import draw_tracks_and_counts
 
@@ -39,7 +39,7 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
 
     # Person A components
     detector = YoloDetector(config.detection)
-    tracker = DummyTracker()
+    tracker = SimpleIOUTracker(iou_threshold=0.3, max_lost_age=15)
     counter = LineCounter(config.counting.line_position)
 
     # Person B components will be instantiated here later, e.g.:
