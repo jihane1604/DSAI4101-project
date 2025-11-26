@@ -1,6 +1,7 @@
-# Ignore dataset and model folders
+# Ignore dataset and model folders and test video folders
 data/
 models/
+videos/
 
 # Ignore large ML files
 *.npy

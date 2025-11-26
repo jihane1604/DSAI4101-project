@@ -10,7 +10,7 @@ def draw_tracks_and_counts(
     frame,
     frame_tracks: FrameTracks,
     counts: CountingState,
-    line_y: Optional[float] = None,
+    line_x: Optional[float] = None,
 ):
     """
     Draw bounding boxes, track IDs, class labels, and total counts on the frame.
@@ -63,7 +63,7 @@ def draw_tracks_and_counts(
         )
         y += 25
 
-    # ----- Draw virtual line -----
-    if line_y is not None:
-        line_pixel = int(line_y * h)
-        cv2.line(frame, (0, line_pixel), (w, line_pixel), (0, 0, 255), 2)
+    # ----- Draw vertical counting line -----
+    if line_x is not None:
+        line_pixel = int(line_x * w)
+        cv2.line(frame, (line_pixel, 0), (line_pixel, h), (0, 0, 255), 2)

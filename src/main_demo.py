@@ -84,17 +84,17 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
         #         pass
 
         # 4) Counting
-        counts: CountingState = counter.update(frame.shape[0], frame_tracks)
+        counts: CountingState = counter.update(frame.shape[1], frame_tracks)
 
         # 5) Visualization
         draw_tracks_and_counts(
             frame,
             frame_tracks,
             counts,
-            line_y=config.counting.line_position,
+            line_x=config.counting.line_position,
         )
 
-        cv2.imshow("Smart Waste Conveyor (stub)", frame)
+        cv2.imshow("Smart Waste Conveyor", frame)
         key = cv2.waitKey(1) & 0xFF
         if key == 27 or key == ord("q"):  # ESC or q
             break
