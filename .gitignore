@@ -1,9 +1,9 @@
-# Ignore dataset and model folders and test video folders
+# === PROJECT DATA & MODELS ===
 data/
 models/
 videos/
 
-# Ignore large ML files
+# === LARGE MACHINE LEARNING FILES ===
 *.npy
 *.npz
 *.h5
@@ -11,16 +11,29 @@ videos/
 *.pth
 *.pt
 *.pkl
+*.joblib
 
-# Ignore Python cache
+# === PYTHON CACHE ===
 __pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Ignore Jupyter temporary folders
+# === JUPYTER NOTEBOOK FILES ===
 .ipynb_checkpoints/
+*/.ipynb_checkpoints/
 
-# Ignore logs
-*.log
+# === WINDOWS / ONE DRIVE TRASH FILES ===
+Thumbs.db
+desktop.ini
 
-# Ignore environment files
+# === EDITOR BACKUP FILES ===
+*.swp
+*.swo
+
+# === ENVIRONMENTS ===
 .env
+.env.*
 environment.yml
+.venv/
+venv/
