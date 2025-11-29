@@ -5,7 +5,7 @@ import numpy as np
 import torch
 from torchvision import transforms, models
 
-from integration_clients import (
+from src.integration_clients import (
     BaseEmbeddingClient,
     BaseAnomalyClient,
     BaseFewShotClient,

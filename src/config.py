@@ -12,8 +12,8 @@ MODELS_DIR = PROJECT_ROOT / "models"
 @dataclass
 class VideoConfig:
     source: Union[int, str] = 0  # 0 for webcam, or path to video file
-    frame_width: int = 1280
-    frame_height: int = 720
+    frame_width: int = 1500
+    frame_height: int = 900
     fps: int = 30
 
 @dataclass
