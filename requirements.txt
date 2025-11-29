@@ -5,3 +5,4 @@ torchvision
 matplotlib
 ultralytics
 joblib
+scikit-learn

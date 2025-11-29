@@ -72,7 +72,12 @@ class YoloDetector(BaseDetector):
         # We request a single result (index 0).
         results = self.model(
             frame,
+            # Pass configuration settings directly to the YOLO model
+            conf=0.01, # Use the minimum score defined in your config
+            iou=0.7,                              # Recommended NMS IoU threshold: 0.45 to 0.70
             verbose=False,
+            # also limit the maximum number of detections
+            max_det=10,
         )[0]
 
         detections: List[Detection] = []

@@ -10,6 +10,7 @@ from src.detector import YoloDetector
 from src.tracker import SimpleIOUTracker
 from src.counter import LineCounter, CountingState
 from src.overlay import draw_tracks_and_counts
+from src.b_anomaly import LOFAnomalyScorer
 
 
 from src.integration_clients import (

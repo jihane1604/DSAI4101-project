@@ -1,8 +1,5 @@
 # === PROJECT DATA & MODELS ===
 data/
-videos/
-models/
-*.pt
 *.zip
 dataset-resized/
 

@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-
+import joblib
 import numpy as np
 import torch
 from torchvision import transforms, models
@@ -123,7 +123,6 @@ class MyEmbeddingClient(BaseEmbeddingClient):
 
 class MyAnomalyClient(BaseAnomalyClient):
     def __init__(self, model_path: str, threshold: float = 0.0):
-        import joblib
         # model_path: path to e.g. isoforest.pkl
         self.model = joblib.load(model_path)
         self.threshold = float(threshold)
@@ -153,7 +152,7 @@ class MyFewShotClient(BaseFewShotClient):
         """
         prototypes_path: npz file with "labels" and "embeddings" arrays.
         """
-        data = np.load(prototypes_path, allow_pickle=True)
+        data = joblib.load(prototypes_path)
         self.labels = list(data["labels"])
         self.prototypes = data["embeddings"]
         self.sim_threshold = float(sim_threshold)

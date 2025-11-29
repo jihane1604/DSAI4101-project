@@ -36,7 +36,7 @@ from sklearn.neighbors import LocalOutlierFactor
 from sklearn.metrics import roc_curve, auc
 import joblib
 
-from b_models_impl import MyEmbeddingClient
+from src.b_models_impl import MyEmbeddingClient
 
 
 
@@ -87,16 +87,22 @@ def extract_embeddings(
 # ============================================
 
 @dataclass
-class LOFModelWrapper:
-    scaler: StandardScaler
-    pca: PCA
-    lof: LocalOutlierFactor
+class LOFAnomalyScorer:
+    scaler: object
+    pca: object
+    lof: object
+    threshold: float
 
-    def decision_function(self, X: np.ndarray) -> np.ndarray:
-        """Return LOF normality score: high = normal, low = anomaly."""
-        Xs = self.scaler.transform(X)
+    def score(self, X_emb):
+        """
+        X_emb: numpy array of embeddings (N, 256)
+        returns: scores, labels  (1 = anomaly, 0 = normal)
+        """
+        Xs = self.scaler.transform(X_emb)
         Xp = self.pca.transform(Xs)
-        return self.lof.decision_function(Xp)
+        scores = -self.lof.decision_function(Xp)
+        labels = (scores >= self.threshold).astype(int)
+        return scores, labels
 
 
 # ============================================
