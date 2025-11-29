@@ -17,36 +17,36 @@ from src.integration_clients import (
     BaseFewShotClient,
 )
 
-from src.b_models_impl import (
-    MyEmbeddingClient,
-    MyFewShotClient,
-)
+# from src.b_models_impl import (
+#     MyEmbeddingClient,
+#     MyFewShotClient,
+# )
 
 # --- Initialize ML Clients ---
-CLASSIFIER_MODEL = 'models/classifier/simple_cnn.pth'
-CLASSES_JSON = 'models/classifier/classes.json'
-ANOMALY_MODEL = 'models/anomaly/lof_scorer.pkl' 
-FEWSHOT_PROTOTYPES = 'models/fewshot/prototypes.pkl'
+# CLASSIFIER_MODEL = 'models/classifier/simple_cnn.pth'
+# CLASSES_JSON = 'models/classifier/classes.json'
+# ANOMALY_MODEL = 'models/anomaly/lof_scorer.pkl' 
+# FEWSHOT_PROTOTYPES = 'models/fewshot/prototypes.pkl'
 
 
-def _classify_trashnet(crop: np.ndarray, client: MyEmbeddingClient) -> str:
-    """
-    Classifies a crop into one of the 6 TrashNet classes using the ResNet model.
-    """
-    with torch.no_grad():
-        # 1. Preprocess and tensorize the crop
-        x = client._preprocess(crop)
+# def _classify_trashnet(crop: np.ndarray, client: MyEmbeddingClient) -> str:
+#     """
+#     Classifies a crop into one of the 6 TrashNet classes using the ResNet model.
+#     """
+#     with torch.no_grad():
+#         # 1. Preprocess and tensorize the crop
+#         x = client._preprocess(crop)
 
-        # 2. Forward pass through the classifier head
-        logits = client.model(x)
+#         # 2. Forward pass through the classifier head
+#         logits = client.model(x)
 
-        # 3. Get predicted class index (tensor -> int)
-        _, pred_idx = torch.max(logits, 1)
-        idx = int(pred_idx.item())          
+#         # 3. Get predicted class index (tensor -> int)
+#         _, pred_idx = torch.max(logits, 1)
+#         idx = int(pred_idx.item())          
 
-        # 4. Map index to class name (list lookup)
-        class_name = client.idx_to_class[idx] 
-        return class_name
+#         # 4. Map index to class name (list lookup)
+#         class_name = client.idx_to_class[idx] 
+#         return class_name
 
 
 def _crop_from_box(frame: np.ndarray, box) -> np.ndarray:
@@ -86,20 +86,20 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
     counter = LineCounter(config.counting.line_position)
 
     # Classification components
-    embedding_client: BaseEmbeddingClient = MyEmbeddingClient(
-        model_path=CLASSIFIER_MODEL,
-        classes_path=CLASSES_JSON
-    )
-    # anomaly_client: BaseAnomalyClient = MyAnomalyClient(
-    #     model_path=ANOMALY_MODEL,
-    #     # NOTE: Adjust this threshold based on your IsolationForest training results!
-    #     threshold=-0.01 
-    # ) 
-    lof_scorer: LOFAnomalyScorer = joblib.load(ANOMALY_MODEL)
-    fewshot_client: BaseFewShotClient = MyFewShotClient(
-        prototypes_path=FEWSHOT_PROTOTYPES,
-        sim_threshold=0.7 # Adjust this based on confidence testing
-    )
+    # embedding_client: BaseEmbeddingClient = MyEmbeddingClient(
+    #     model_path=CLASSIFIER_MODEL,
+    #     classes_path=CLASSES_JSON
+    # )
+    # # anomaly_client: BaseAnomalyClient = MyAnomalyClient(
+    # #     model_path=ANOMALY_MODEL,
+    # #     # NOTE: Adjust this threshold based on your IsolationForest training results!
+    # #     threshold=-0.01 
+    # # ) 
+    # lof_scorer: LOFAnomalyScorer = joblib.load(ANOMALY_MODEL)
+    # fewshot_client: BaseFewShotClient = MyFewShotClient(
+    #     prototypes_path=FEWSHOT_PROTOTYPES,
+    #     sim_threshold=0.7 # Adjust this based on confidence testing
+    # )
 
     frame_id = 0
 
@@ -122,48 +122,48 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
         # 2) Tracking
         frame_tracks = tracker.update(frame, frame_detections)
 
-        # 3) Specialized Classification Logic
-        for track in frame_tracks.tracks:
+        # # 3) Specialized Classification Logic
+        # for track in frame_tracks.tracks:
 
-            # Only run the expensive classification if the object is NEW (age < 5) or if it hasn't been successfully classified yet.
-            if track.is_classified:
-                continue
+        #     # Only run the expensive classification if the object is NEW (age < 5) or if it hasn't been successfully classified yet.
+        #     if track.is_classified:
+        #         continue
 
-            # 1. Crop the object using the track's latest box
-            crop = _crop_from_box(frame, track.box)
+        #     # 1. Crop the object using the track's latest box
+        #     crop = _crop_from_box(frame, track.box)
             
-            # 2. Skip if the crop is invalid (empty)
-            if crop.size == 0:
-                continue
+        #     # 2. Skip if the crop is invalid (empty)
+        #     if crop.size == 0:
+        #         continue
                 
-            # --- Execute ML Pipeline ---
-            try:
-                # Extract embedding
-                emb = embedding_client.embed_crop(crop)
+        #     # --- Execute ML Pipeline ---
+        #     try:
+        #         # Extract embedding
+        #         emb = embedding_client.embed_crop(crop)
 
-                # Anomaly Check
-                if lof_scorer.is_anomaly(emb):
-                    fs_result = fewshot_client.classify(emb)
+        #         # Anomaly Check
+        #         if lof_scorer.is_anomaly(emb):
+        #             fs_result = fewshot_client.classify(emb)
                     
-                    if fs_result.is_confident:
-                        # Confident Rare Classification
-                        track.class_name = f"RARE: {fs_result.label}"
-                        track.is_classified = True # Classification is complete
-                    else:
-                        # Unclassified Anomaly
-                        track.class_name = "UNKNOWN ANOMALY"
-                        # Keep is_classified = False so it can be re-evaluated later if needed
+        #             if fs_result.is_confident:
+        #                 # Confident Rare Classification
+        #                 track.class_name = f"RARE: {fs_result.label}"
+        #                 track.is_classified = True # Classification is complete
+        #             else:
+        #                 # Unclassified Anomaly
+        #                 track.class_name = "UNKNOWN ANOMALY"
+        #                 # Keep is_classified = False so it can be re-evaluated later if needed
                 
-                else:
-                    # Standard TrashNet Classification
-                    track.class_name = _classify_trashnet(crop, embedding_client)
-                    track.is_classified = True # Classification is complete
+        #         else:
+        #             # Standard TrashNet Classification
+        #             track.class_name = _classify_trashnet(crop, embedding_client)
+        #             track.is_classified = True # Classification is complete
                     
-            except Exception as e:
-                # Handle cases where model inference fails (e.g., bad crop, file error)
-                print(f"Classification failed for track {track.track_id}: {e}")
-                track.class_name = "Error"
-                # We can try again later if is_classified is left False
+        #     except Exception as e:
+        #         # Handle cases where model inference fails (e.g., bad crop, file error)
+        #         print(f"Classification failed for track {track.track_id}: {e}")
+        #         track.class_name = "Error"
+        #         # We can try again later if is_classified is left False
 
         # 4) Counting
         counts: CountingState = counter.update(frame.shape[1], frame_tracks)
