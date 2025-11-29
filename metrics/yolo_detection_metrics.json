@@ -2,12 +2,12 @@
     "model_used": "models\\detector\\yolo_trashnet.pt",
     "mAP_score_explanation": "mAP is the average precision across all classes, based on specific IoU thresholds.",
     "mAP@50": {
-        "value": 0.9651,
+        "value": 0.9343,
         "iou_threshold": 0.5,
         "description": "Measures performance when a detection is considered True Positive if IoU >= 50%. (Less strict localization)."
     },
     "mAP@50-95": {
-        "value": 0.9651,
+        "value": 0.9239,
         "iou_thresholds": "0.5 to 0.95 (in steps of 0.05)",
         "description": "The standard metric for accurate localization. It averages the mAP across 10 IoU thresholds (0.5, 0.55, 0.6, ..., 0.95)."
     }

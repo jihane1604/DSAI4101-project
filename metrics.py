@@ -32,7 +32,7 @@ def calculate_detection_metrics():
     results = model.val(
         data=str(YOLO_DATA_CONFIG),
         imgsz=640,
-        split='test',
+        split='val',
         save_json=False,
         conf=0.25, # Confidence threshold for initial True/False Positive assignment
         # The IoU threshold (0.7) set here is for Non-Maximum Suppression (NMS), 

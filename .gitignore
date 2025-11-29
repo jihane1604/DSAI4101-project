@@ -2,6 +2,8 @@
 data/
 *.zip
 dataset-resized/
+*.pt
+videos/
 
 # === PYTHON CACHE ===
 src/__pycache__/
@@ -27,3 +29,7 @@ desktop.ini
 .venv/
 venv/
 environment.yml
+
+# === MISCELANIOUS SCRIPTS  ===
+convert_xml_to_yolo.py
+train_yolo_2.py
