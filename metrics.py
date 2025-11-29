@@ -3,11 +3,11 @@ from pathlib import Path
 from ultralytics import YOLO
 
 # --- Configuration ---
-YOLO_DATA_CONFIG = Path("../data/data.yaml") 
-CUSTOM_YOLO_WEIGHTS = Path("../models/detector/yolo_trashnet.pt") 
+YOLO_DATA_CONFIG = Path("data/data.yaml") 
+CUSTOM_YOLO_WEIGHTS = Path("models/detector/yolo_trashnet.pt") 
 FALLBACK_YOLO_MODEL = "yolov8n.pt" 
 
-METRICS_DIR = Path("../metrics")
+METRICS_DIR = Path("metrics")
 METRICS_DIR.mkdir(parents=True, exist_ok=True)
 
 def calculate_detection_metrics():

@@ -18,10 +18,10 @@ class VideoConfig:
 
 @dataclass
 class DetectionConfig:
-    model_path: Path = MODELS_DIR / "detector" / "best.pt"
+    model_path: Path = MODELS_DIR / "detector" / "yolo_trashnet.pt"
     confidence_threshold: float = 0.25
     iou_threshold: float = 0.45
-    device: str = "cpu"  # or "cuda"
+    device: str = "cuda"  # or "cuda"
 
 @dataclass
 class CountingConfig:

@@ -3,6 +3,7 @@ data/
 models/
 videos/
 dataset-resized/
+runs/
 
 # === LARGE MACHINE LEARNING FILES ===
 *.npy

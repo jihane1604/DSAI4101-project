@@ -31,7 +31,7 @@ def train_detector(epochs: int = 50, batch_size: int = 16, model_size: str = 'n'
         epochs=epochs,               # Number of training epochs (iterations over the dataset)
         batch=batch_size,            # Number of images per training step
         name='yolo_trashnet_run',    # Name for the results folder
-        device='cpu',                # Use GPU (0) if available, or 'cpu'
+        device=0,                # Use GPU (0) if available, or 'cpu'
         save=True,                   # Save the best and last model checkpoints
         exist_ok=True,               # Overwrite existing runs with the same name
         project=str(WEIGHTS_SAVE_PATH), # Save results into the models/detector folder
