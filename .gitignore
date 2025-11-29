@@ -1,9 +1,10 @@
 # === PROJECT DATA & MODELS ===
 data/
 videos/
-
-# NOTE:
-# models/ is NOT ignored so .pth, .pkl, .joblib WILL be visible on GitHub.
+models/
+*.pt
+*.zip
+dataset-resized/
 
 # === PYTHON CACHE ===
 __pycache__/
