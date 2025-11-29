@@ -45,6 +45,7 @@ class Track:
     score: float
     age: int            # number of frames this track has been alive
     counted: bool = False  # has this track already been counted
+    is_classified: bool = field(default=False)  # store the classification state
 
 @dataclass
 class FrameTracks:
