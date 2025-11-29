@@ -1,26 +1,24 @@
-# End-to-end conveyor demo script
-
 import argparse
 import cv2
 import numpy as np
 import torch
+import joblib
 
 from src.config import PipelineConfig
 from src.detector import YoloDetector
 from src.tracker import SimpleIOUTracker
 from src.counter import LineCounter, CountingState
 from src.overlay import draw_tracks_and_counts
-from src.b_anomaly import LOFAnomalyScorer
 
+from src.b_anomaly import LOFAnomalyScorer, LOFModelWrapper   
 
 from src.integration_clients import (
     BaseEmbeddingClient,
-    BaseAnomalyClient,
     BaseFewShotClient,
 )
+
 from src.b_models_impl import (
     MyEmbeddingClient,
-    MyAnomalyClient,
     MyFewShotClient,
 )
 
@@ -35,19 +33,21 @@ def _classify_trashnet(crop: np.ndarray, client: MyEmbeddingClient) -> str:
     """
     Classifies a crop into one of the 6 TrashNet classes using the ResNet model.
     """
-    
     with torch.no_grad():
         # 1. Preprocess and tensorize the crop
-        x = client._preprocess(crop) 
-        
-        # 2. Run the full forward pass (to get logits from the classifier head)
-        logits = client.model(x) 
-        
-        # 3. Get the predicted class index
+        x = client._preprocess(crop)
+
+        # 2. Forward pass through the classifier head
+        logits = client.model(x)
+
+        # 3. Get predicted class index (tensor -> int)
         _, pred_idx = torch.max(logits, 1)
-        
-        # 4. Convert index back to class name
-        return client.idx_to_class[str(pred_idx.item())]
+        idx = int(pred_idx.item())          
+
+        # 4. Map index to class name (list lookup)
+        class_name = client.idx_to_class[idx] 
+        return class_name
+
 
 def _crop_from_box(frame: np.ndarray, box) -> np.ndarray:
     """
@@ -90,11 +90,12 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
         model_path=CLASSIFIER_MODEL,
         classes_path=CLASSES_JSON
     )
-    anomaly_client: BaseAnomalyClient = MyAnomalyClient(
-        model_path=ANOMALY_MODEL,
-        # NOTE: Adjust this threshold based on your IsolationForest training results!
-        threshold=-0.01 
-    ) 
+    # anomaly_client: BaseAnomalyClient = MyAnomalyClient(
+    #     model_path=ANOMALY_MODEL,
+    #     # NOTE: Adjust this threshold based on your IsolationForest training results!
+    #     threshold=-0.01 
+    # ) 
+    lof_scorer: LOFAnomalyScorer = joblib.load(ANOMALY_MODEL)
     fewshot_client: BaseFewShotClient = MyFewShotClient(
         prototypes_path=FEWSHOT_PROTOTYPES,
         sim_threshold=0.7 # Adjust this based on confidence testing
@@ -141,7 +142,7 @@ def run_demo(config: PipelineConfig, video_source=None) -> None:
                 emb = embedding_client.embed_crop(crop)
 
                 # Anomaly Check
-                if anomaly_client.is_anomalous(emb):
+                if lof_scorer.is_anomaly(emb):
                     fs_result = fewshot_client.classify(emb)
                     
                     if fs_result.is_confident:

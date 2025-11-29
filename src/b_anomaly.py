@@ -39,6 +39,28 @@ import joblib
 from src.b_models_impl import MyEmbeddingClient
 
 
+@dataclass
+class LOFModelWrapper:
+    """
+    Wraps scaler + PCA + LOF so we can save/load them as one object
+    and call `decision_function` on raw embeddings.
+    """
+    scaler: StandardScaler
+    pca: PCA
+    lof: LocalOutlierFactor
+
+    def decision_function(self, X_emb: np.ndarray) -> np.ndarray:
+        """
+        X_emb: (N, embed_dim) raw CNN embeddings.
+
+        Returns LOF decision scores:
+        - higher = more normal
+        - lower  = more anomalous
+        """
+        Xs = self.scaler.transform(X_emb)
+        Xp = self.pca.transform(Xs)
+        scores = self.lof.decision_function(Xp)  # LOF's own convention
+        return scores
 
 # ============================================
 # 1) Paths
@@ -85,25 +107,6 @@ def extract_embeddings(
 # ============================================
 # 3) Wrapper for LOF + PCA + Scaler
 # ============================================
-
-@dataclass
-class LOFAnomalyScorer:
-    scaler: object
-    pca: object
-    lof: object
-    threshold: float
-
-    def score(self, X_emb):
-        """
-        X_emb: numpy array of embeddings (N, 256)
-        returns: scores, labels  (1 = anomaly, 0 = normal)
-        """
-        Xs = self.scaler.transform(X_emb)
-        Xp = self.pca.transform(Xs)
-        scores = -self.lof.decision_function(Xp)
-        labels = (scores >= self.threshold).astype(int)
-        return scores, labels
-
 
 # ============================================
 # 4) Train LOF model
@@ -171,6 +174,42 @@ def train_lof(
     print(f"AUC = {roc_auc:.3f}")
 
     return model, threshold
+class LOFAnomalyScorer:
+    """
+    Runtime scorer used by main_demo.
+
+    It wraps the trained LOF pipeline (LOFModelWrapper) and a threshold.
+    main_demo will do something like:
+        bundle = joblib.load("models/anomaly/lof_model.pkl")
+        scorer = LOFAnomalyScorer(bundle["model"], bundle["threshold"])
+    """
+    def __init__(self, lof_model_wrapper, threshold: float):
+        # lof_model_wrapper is the LOFModelWrapper you created in train_lof()
+        self.model = lof_model_wrapper
+        self.threshold = float(threshold)
+
+    def decision_function(self, feats):
+        """
+        feats: 1D embedding vector for one sample.
+        Returns: np.array of shape (1,) with LOF scores
+                 (higher = more normal, lower = more anomalous).
+        """
+        feats = np.asarray(feats, dtype=np.float32).reshape(1, -1)
+        scores = self.model.decision_function(feats)   # uses LOFModelWrapper.decision_function
+        return np.asarray(scores).ravel()              # ensure it's a 1D array
+
+    def score(self, x) -> float:
+        """
+        Convenience: single float score for one sample.
+        """
+        return float(self.decision_function(x)[0])
+
+    def is_anomaly(self, x) -> bool:
+        """
+        Use the SAME rule you printed in training:
+          "Rule: score < threshold → anomaly"
+        """
+        return self.score(x) < self.threshold
 
 
 # ============================================
@@ -181,30 +220,35 @@ def main():
     root = get_project_root()
     print("Project root:", root)
 
-    # Classifier paths
     model_path = root / "models" / "classifier" / "simple_cnn.pth"
     classes_path = root / "models" / "classifier" / "classes.json"
 
-    # Create embedding client
     emb_client = MyEmbeddingClient(
         model_path=str(model_path),
         classes_path=str(classes_path)
     )
 
-    # Extract embeddings
     train_dir = root / "data" / "split" / "train"
     rare_dir  = root / "data" / "rare_classes"
 
     X_known = extract_embeddings(emb_client, train_dir)
     X_anom  = extract_embeddings(emb_client, rare_dir)
 
-    # Train LOF
     lof_model, threshold = train_lof(
         X_known,
         X_anom,
         contamination=0.05,
         chosen_percentile=8
     )
+
+    # 🔽 NEW: save scorer
+    scorer = LOFAnomalyScorer(lof_model, threshold)
+
+    out_path = root / "models" / "anomaly" / "lof_scorer.pkl"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    joblib.dump(scorer, out_path)
+    print(f"[SAVE] LOFAnomalyScorer saved to {out_path}")
+
 
 if __name__ == "__main__":
     main()
