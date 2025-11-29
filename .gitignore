@@ -2,6 +2,7 @@
 data/
 models/
 videos/
+dataset-resized/
 
 # === LARGE MACHINE LEARNING FILES ===
 *.npy
@@ -38,4 +39,6 @@ environment.yml
 .venv/
 venv/
 
+# === MISSCELANIOUS SCRIPTS ===
 src/train.py
+yolo_dataset.py
