@@ -1,19 +1,9 @@
 # === PROJECT DATA & MODELS ===
 data/
-models/
 videos/
-dataset-resized/
-runs/
 
-# === LARGE MACHINE LEARNING FILES ===
-*.npy
-*.npz
-*.h5
-*.hdf5
-*.pth
-*.pt
-*.pkl
-*.joblib
+# NOTE:
+# models/ is NOT ignored so .pth, .pkl, .joblib WILL be visible on GitHub.
 
 # === PYTHON CACHE ===
 __pycache__/
@@ -36,10 +26,6 @@ desktop.ini
 # === ENVIRONMENTS ===
 .env
 .env.*
-environment.yml
 .venv/
 venv/
-
-# === MISSCELANIOUS SCRIPTS ===
-src/train.py
-yolo_dataset.py
+environment.yml
