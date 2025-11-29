@@ -6,7 +6,7 @@ import numpy as np
 
 from ultralytics import YOLO
 
-from src.types import Detection, FrameDetections, BoundingBox
+from src.data_types import Detection, FrameDetections, BoundingBox
 from src.config import DetectionConfig, MODELS_DIR
 
 

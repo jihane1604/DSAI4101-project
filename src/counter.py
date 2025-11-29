@@ -1,6 +1,6 @@
 from typing import Dict
 
-from src.types import FrameTracks, CountingState, Track
+from src.data_types import FrameTracks, CountingState, Track
 
 
 class LineCounter:

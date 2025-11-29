@@ -2,7 +2,7 @@
 
 import cv2
 
-from src.types import FrameTracks, CountingState
+from src.data_types import FrameTracks, CountingState
 from typing import Optional
 
 

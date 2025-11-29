@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Dict
 import numpy as np
 
-from src.types import FrameDetections, FrameTracks, Track, BoundingBox
+from src.data_types import FrameDetections, FrameTracks, Track, BoundingBox
 
 
 class BaseTracker(ABC):

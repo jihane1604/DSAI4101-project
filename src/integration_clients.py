@@ -42,7 +42,7 @@ class BaseAnomalyClient(ABC):
     def score(self, embedding: np.ndarray) -> float:
         """
         Return an anomaly score for the embedding.
-        Higher score = more anomalous.
+        Lower score = more anomalous.
         """
         raise NotImplementedError
 
